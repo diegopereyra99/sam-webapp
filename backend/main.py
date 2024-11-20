@@ -65,7 +65,7 @@ async def get_mask(clicks: List[Dict[str, float]] = Body(...)):
         print(click)
     
     # Simulating the image size; for simplicity, let's assume the image size is 500x500
-    img_width, img_height = uploaded_image.size
+    img_width, img_height = Image.open(BytesIO(uploaded_image)).size
 
     # Create a white image (this is the mask image)
     mask = Image.new("L", (img_width, img_height))
@@ -78,6 +78,7 @@ async def get_mask(clicks: List[Dict[str, float]] = Body(...)):
     right = left + square_size
     bottom = top + square_size
     draw.rectangle([left, top, right, bottom], fill="white")
+    # mask.save("mask.png")
 
     # Convert the mask to base64 to send it as a response (as an example)
     buffered = BytesIO()

@@ -7,7 +7,7 @@ function Sidebar({ onUpload, onSave, onReset }) {
       <h2>Controls</h2>
       <button className="sidebar-button" onClick={onUpload}>Upload Image</button>
       <button className="sidebar-button" onClick={onSave}>Save Mask</button>
-      <button className="sidebar-button" onClick={onReset}>Reset</button>
+      <button className="sidebar-button" onClick={onReset}>Reset Mask</button>
     </div>
   );
 }
