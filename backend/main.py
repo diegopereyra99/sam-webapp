@@ -5,6 +5,18 @@ from io import BytesIO
 from PIL import Image, ImageDraw
 import base64
 from typing import List, Dict
+import numpy as np
+import torch
+from sam2.build_sam import build_sam2
+from sam2.sam2_image_predictor import SAM2ImagePredictor
+
+sam2_checkpoint = "../../sam2/checkpoints/sam2.1_hiera_large.pt"
+model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+sam2_model = build_sam2(model_cfg, sam2_checkpoint, device=device)
+
+predictor = SAM2ImagePredictor(sam2_model)
 
 app = FastAPI()
 
@@ -44,9 +56,8 @@ async def upload_image(image: UploadFile = File(...)):
     # Print image size (in pixels)
     print(f"Image dimensions: {img.size} (width x height)")
     
-    # Here, you can perform any further processing on the image (e.g., saving or analyzing)
-    # Save the image temporarily (for example purposes)
-    # img.save("uploaded_image.png")
+    img = np.array(img.convert("RGB"))
+    predictor.set_image(img)
 
     return {"message": "Image uploaded successfully, ready for further processing."}
 
@@ -65,20 +76,20 @@ async def get_mask(clicks: List[Dict[str, float]] = Body(...)):
         print(click)
     
     # Simulating the image size; for simplicity, let's assume the image size is 500x500
-    img_width, img_height = Image.open(BytesIO(uploaded_image)).size
+    # img_width, img_height = Image.open(BytesIO(uploaded_image)).size
+    
+    input_points = np.array([[click["x"], click["y"]] for click in clicks])
+    input_labels = np.array([click["label"] for click in clicks])
+    
+    masks, scores, _ = predictor.predict(
+        point_coords=input_points,
+        point_labels=input_labels,
+        multimask_output=False,
+    )
 
-    # Create a white image (this is the mask image)
-    mask = Image.new("L", (img_width, img_height))
-    draw = ImageDraw.Draw(mask)
-
-    # Draw a simple square in the center of the mask
-    square_size = 10 * len(clicks)  # Set the size of the square
-    left = (img_width - square_size) // 2
-    top = (img_height - square_size) // 2
-    right = left + square_size
-    bottom = top + square_size
-    draw.rectangle([left, top, right, bottom], fill="white")
-    # mask.save("mask.png")
+    # print(len(np.unique(masks[0])))
+    
+    mask = Image.fromarray((masks[0] * 255).astype(np.uint8))
 
     # Convert the mask to base64 to send it as a response (as an example)
     buffered = BytesIO()
