@@ -3,9 +3,11 @@ import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
 import ImageCanvas from './components/ImageCanvas';
 import { uploadImage, getMask } from './api/samApi';
+import { combineMasks } from './utils/maskUtils';
 
 function App() {
   const [imageSrc, setImageSrc] = useState(null); // Uploaded image source
+  const [baseMask, setBaseMask] = useState(null); // Base mask (base64 or URL)
   const [maskSrc, setMaskSrc] = useState(null); // Mask data (base64 or URL)
   const [clicks, setClicks] = useState([]); // List of clicks
 
@@ -26,21 +28,35 @@ function App() {
     input.click();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (maskSrc) {
-      const link = document.createElement('a');
-      link.href = `data:image/png;base64,${maskSrc}`;
-      link.download = 'mask.png';
-      link.click();
+      try {
+        const base64Data = maskSrc.replace(/^data:image\/png;base64,/, '');
+        const blob = new Blob([Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0))], {
+          type: 'image/png',
+        });
+
+        const handle = await window.showSaveFilePicker({
+          suggestedName: 'mask.png',
+          types: [
+            {
+              description: 'PNG image',
+              accept: { 'image/png': ['.png'] },
+            },
+          ],
+        });
+
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+
+        console.log('File saved successfully!');
+      } catch (error) {
+        console.error('Error saving file:', error);
+      }
     } else {
       alert('No mask to save!');
     }
-  };
-
-  const handleReset = () => {
-    // setImageSrc(null);
-    setMaskSrc(null);
-    setClicks([]); // Clear clicks
   };
 
   const handleAddClick = async (newClick) => {
@@ -48,20 +64,47 @@ function App() {
     setClicks(updatedClicks); // Update the clicks state
 
     try {
-      const base64_mask = await getMask(updatedClicks); // Fetch the new mask from the API
-      setMaskSrc(base64_mask);
-
+      const mask_resp = await getMask(updatedClicks);
+      const combinedMaskBase64 = await combineMasks(mask_resp, baseMask);
+      console.log('Combined mask:', combinedMaskBase64);
+      setMaskSrc(combinedMaskBase64);
     } catch (error) {
       console.error('Error generating mask:', error);
     }
   };
 
+  const handleHoldMask = async () => {
+    if (!maskSrc) {
+      alert('No mask to hold!');
+      return;
+    }
+
+    try {
+      setClicks([]);
+      if (!baseMask) {
+        setBaseMask(maskSrc);
+      } else {
+        const combinedMaskBase64 = await combineMasks(maskSrc, baseMask);
+        setBaseMask(combinedMaskBase64);
+      }
+      console.log('Mask held successfully!');
+    } catch (error) {
+      console.error('Error holding mask:', error);
+    }
+  };
+
+  const handleReset = () => {
+    setMaskSrc(null);
+    setBaseMask(null); // Clear the base mask on reset
+    setClicks([]);
+  };
+
   return (
     <div className="app">
-      <Sidebar onUpload={handleUpload} onSave={handleSave} onReset={handleReset} />
+      <Sidebar onUpload={handleUpload} onHold={handleHoldMask} onSave={handleSave} onReset={handleReset} />
       <ImageCanvas
         imageSrc={imageSrc}
-        maskSrc={maskSrc}
+        maskSrc={maskSrc} // Use combined mask if available, else use maskSrc
         clicks={clicks}
         onAddClick={handleAddClick} // Pass function to add new clicks
       />
