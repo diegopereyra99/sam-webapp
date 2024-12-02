@@ -4,7 +4,7 @@
 A simple web application integrating the Segment Anything Model (SAM) for efficient image segmentation. This project includes a Python-based backend and a React-powered frontend.
 
 
-![Demo](path/to/demo.gif)
+![](media/demo.webp)
 
 
 ## Prerequisites
