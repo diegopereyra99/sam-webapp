@@ -1,70 +1,93 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# SAM WebApp
 
-## Available Scripts
+A simple web application integrating the Segment Anything Model (SAM) for efficient image segmentation. This project includes a Python-based backend and a React-powered frontend.
 
-In the project directory, you can run:
 
-### `npm start`
+![Demo](path/to/demo.gif)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Prerequisites
 
-### `npm test`
+- **Backend**: Python >= 3.10
+- **Frontend**: Node.js >= 14.x and npm or yarn
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Ensure you have these installed on your system before proceeding.
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Installation and Setup
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### 1. Backend Setup
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/diegopereyra99/sam-webapp.git
+   cd sam-webapp/backend
+   ```
 
-### `npm run eject`
+2. Create a virtual environment and activate it:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # Linux/macOS
+   venv\Scripts\activate   # Windows
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+4. Run the backend API:
+   ```bash
+   uvicorn main:app --port 8000
+   ```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+The backend should now be running at `http://localhost:8000`.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+---
 
-## Learn More
+### 2. Frontend Setup
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+1. Navigate to the frontend directory:
+   ```bash
+   cd ../frontend
+   ```
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
 
-### Code Splitting
+3. Start the development server:
+   ```bash
+   npm start
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+The frontend should be accessible at `http://localhost:3000`.
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Running the Application
 
-### Making a Progressive Web App
+1. Start the backend as described in the **Backend Setup** section.
+   - If running in a more powerful instance, forward the backend to `localhost:8000` using SSH or port forwarding (the frontend hits the API there).
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+2. Start the frontend as described in the **Frontend Setup** section.
 
-### Advanced Configuration
+4. Access the web app at `http://localhost:3000`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-### Deployment
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+---
 
-### `npm run build` fails to minify
+## Usage
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Upload an image through the frontend interface, and for each click the SAM mask will be generated connecting to the backend and displayed in the webapp. Each mask can be hold to combine and overlap them, once finished it can be saved.
+
+---
+
+## Acknowledgements
+
+- Segment Anything Model ([SAM](https://segment-anything.com))  
+- Built using [React](https://reactjs.org/) and [FastAPI](https://fastapi.tiangolo.com/).
