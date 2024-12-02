@@ -7,16 +7,13 @@ import base64
 from typing import List, Dict
 import numpy as np
 import torch
-from sam2.build_sam import build_sam2
 from sam2.sam2_image_predictor import SAM2ImagePredictor
 
-sam2_checkpoint = "../../sam2/checkpoints/sam2.1_hiera_large.pt"
-model_cfg = "configs/sam2.1/sam2.1_hiera_l.yaml"
+hf_model_id = "facebook/sam2-hiera-small"
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
-sam2_model = build_sam2(model_cfg, sam2_checkpoint, device=device)
 
-predictor = SAM2ImagePredictor(sam2_model)
+predictor = SAM2ImagePredictor.from_pretrained(hf_model_id, device=device)
 
 app = FastAPI()
 
